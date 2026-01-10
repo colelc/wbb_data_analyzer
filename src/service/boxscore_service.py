@@ -22,7 +22,16 @@ class BoxscoreService(object):
         for game in games_list:
             #self.logger.info(str(game))
             boxscore_file = game["boxscore_file"]
-            team_data = self.process_boxscore_file(boxscore_file)
+            team_totals = self.process_boxscore_file(boxscore_file)
+            if team_totals is None:
+                self.logger.error("no team totals, returning")
+                break
+
+            #self.logger.info(str(team_totals))
+            game["team_totals"] = team_totals
+
+            #game[team_totals["team"]] = team_totals
+            self.logger.info(str(game))
 
     def process_boxscore_file(self, boxscore_file:str):
         with open(boxscore_file, "r", encoding="utf8") as file:
@@ -30,25 +39,31 @@ class BoxscoreService(object):
             #self.logger.info(str(soup))
 
             teams = soup.select("div.Boxscore.flex.flex-column:has(.Boxscore__Title)")
+
             results = []
             for team in teams:
-                results.append(self.extract_team_totals(team))
-
-            for name, stats in results:
-                self.logger.info(name + " " + str(stats))
+                #results.append(self.extract_team_totals(team))
+                team_totals = self.extract_team_totals(team)
+                if team_totals is None:
+                    self.logger.info(team + ": no totals")
+                    return None
+                else:
+                    #self.logger.info(str(team_totals))
+                    results.append(team_totals)
+                    #return team_totals
 
             return results
-        
+
     def extract_team_totals(self, team_block):
         team_name = team_block.select_one(".BoxscoreItem__TeamName").get_text(strip=True)
         
         scroller = team_block.select_one("div.Table__Scroller table")
         if not scroller:
-            return team_name, None
+            return None
         
         all_rows = scroller.select("tbody tr")
         if len(all_rows) < 10:  # Basic sanity check
-            return team_name, None
+            return None
         
         # Team totals are 2nd-to-last row (index -2)
         totals_row = all_rows[-2]
@@ -56,9 +71,48 @@ class BoxscoreService(object):
         
         # Just verify it has the expected structure (empty first cell, PTS in second)
         if len(cells) >= 13 and not cells[0] and cells[1] and cells[1].isdigit():
-            return team_name, cells[1:]  # drop leading empty entry
+            stats = cells[1:]
+            return_stats = dict()
+            return_stats["team"] = team_name
+            
+            return_stats["PTS"] = int(stats[0])
+
+            fg_stats = stats[1].split("-")
+            fgm = fg_stats[0]
+            fga = fg_stats[1]
+            return_stats["FG"] = int(fgm)
+            return_stats["FGA"] = int(fga)
+
+            fg3_stats = stats[2].split("-")
+            fg3m = fg3_stats[0]
+            fg3a = fg3_stats[1]
+            return_stats["FG3"] = int(fg3m)
+            return_stats["FG3A"] = int(fg3a)
+
+            ft_stats = stats[3].split("-")
+            ftm = ft_stats[0]
+            fta = ft_stats[1]
+            return_stats["FT"] = int(ftm)
+            return_stats["FTA"] = int(fta)
+
+            return_stats["REB"] = int(stats[4])
+            return_stats["AST"] = int(stats[5])
+            return_stats["TO"] = int(stats[6])
+            return_stats["STL"] = int(stats[7])
+            return_stats["BLK"] = int(stats[8])
+            return_stats["OREB"] = int(stats[9])
+            return_stats["DREB"] = int(stats[10])
+            return_stats["PF"] = int(stats[11])
+            #return team_name, cells[1:]  # drop leading empty entry
+            #game[team_name] = return_stats
+            #return {team_name: return_stats}
+            #self.logger.info("RETURNING")
+            #print(str(return_stats))
+
+            return return_stats
         
-        return team_name, None
+        return None
+
 
 
         
