@@ -1,3 +1,4 @@
+import json
 import re
 import os
 from datetime import datetime
@@ -30,14 +31,17 @@ class BoxscoreService(object):
             #self.logger.info(str(team_totals))
             game["team_totals"] = team_totals
 
-            #game[team_totals["team"]] = team_totals
-            self.logger.info(str(game))
+            #self.logger.info(str(game))
 
     def process_boxscore_file(self, boxscore_file:str):
         with open(boxscore_file, "r", encoding="utf8") as file:
             soup = BeautifulSoup(file, "html.parser")
             #self.logger.info(str(soup))
 
+            # extract home/away team
+            home_away = self.extract_home_away(soup)
+
+            # extract team stats
             teams = soup.select("div.Boxscore.flex.flex-column:has(.Boxscore__Title)")
 
             results = []
@@ -53,6 +57,29 @@ class BoxscoreService(object):
                     #return team_totals
 
             return results
+        
+    def extract_home_away(self, soup):
+        # get the last <script> tag
+        last_script = soup.find_all("script")[-1]
+
+        # get the JS text
+        script_text = last_script.string or last_script.get_text()
+
+        # remove the JS assignment prefix
+        prefix = "window['__CONFIG__']="
+        if script_text.startswith(prefix):
+            json_str = script_text[len(prefix):]
+        else:
+            # fallback: split on '=' once
+            json_str = script_text.split('=', 1)[-1]
+
+        # parse JSON and extract mode
+        config = json.loads(json_str)
+        #mode_value = config["mode"]
+        info = config["prsdTms"]
+
+        print(info)  # "universal"
+        return info
 
     def extract_team_totals(self, team_block):
         team_name = team_block.select_one(".BoxscoreItem__TeamName").get_text(strip=True)
@@ -103,11 +130,6 @@ class BoxscoreService(object):
             return_stats["OREB"] = int(stats[9])
             return_stats["DREB"] = int(stats[10])
             return_stats["PF"] = int(stats[11])
-            #return team_name, cells[1:]  # drop leading empty entry
-            #game[team_name] = return_stats
-            #return {team_name: return_stats}
-            #self.logger.info("RETURNING")
-            #print(str(return_stats))
 
             return return_stats
         
