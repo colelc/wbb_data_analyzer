@@ -59,16 +59,33 @@ class FreethrowService(object):
             return
         
         for bs in boxscore_list:
-            self.logger.info(str(bs))
-            homeTeam = bs["homeTeam"]["team"]
+            print("")
+            #self.logger.info(str(bs))
+            game_date = bs["game_date"]
+            home_team = bs["homeTeam"]["team"]
+            home_team_pts = str(bs["homeTeam"]["PTS"])
             homeTeam_ft = bs["homeTeam"]["FT"]
             homeTeam_fta = bs["homeTeam"]["FTA"]
-            self.logger.info("homeTeam: " + homeTeam + " " + str(homeTeam_ft) + "-" + str(homeTeam_fta))
 
-            awayTeam = bs["awayTeam"]["team"]
+            away_team = bs["awayTeam"]["team"]
+            away_team_pts = str(bs["awayTeam"]["PTS"])
             awayTeam_ft = bs["awayTeam"]["FT"]
             awayTeam_fta = bs["awayTeam"]["FTA"]
-            self.logger.info("awayTeam: " + awayTeam + " " + str(awayTeam_ft) + "-" + str(awayTeam_fta))
+
+            pt_diff = str(abs(bs["awayTeam"]["PTS"] - bs["homeTeam"]["PTS"]))
+
+            print(game_date + " "  + away_team + " at "  + home_team + ": Final Score: " + home_team_pts + "-" + away_team_pts)
+
+            # self.logger.info(str(bs["game_date"]) + " " + str(bs["homeTeam"]["team"]) + " vs. " + str(bs["awayTeam"]["team"]) + " " + str(bs["homeTeam"]["PTS"]) +  "-" + str(bs["awayTeam"]["PTS"]))
+            # homeTeam = bs["homeTeam"]["team"]
+            # homeTeam_ft = bs["homeTeam"]["FT"]
+            # homeTeam_fta = bs["homeTeam"]["FTA"]
+            print(game_date + " " + home_team + " FT-FTA: " + str(homeTeam_ft) + "-" + str(homeTeam_fta))
+
+            # awayTeam = bs["awayTeam"]["team"]
+            # awayTeam_ft = bs["awayTeam"]["FT"]
+            # awayTeam_fta = bs["awayTeam"]["FTA"]
+            print(game_date + " " + away_team + " FT-FTA: " + str(awayTeam_ft) + "-" + str(awayTeam_fta))
 
 
 
