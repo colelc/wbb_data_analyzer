@@ -23,7 +23,8 @@ class App(object):
         BoxscoreService(config).collect_boxscore_data()
          
         # analyze FT percentages, losses 5 points or less
-        FreethrowService(config).analyze_close_game_ft_percentages("L")
+        # FreethrowService(config).analyze_close_game_ft_percentages("L")
+        # FreethrowService(config).analyze_close_game_ft_percentages("W")
 
 
 

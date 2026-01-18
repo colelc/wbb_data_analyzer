@@ -55,8 +55,8 @@ class FreethrowService(object):
         return filtered
     
     def freethrow_analyis(self, boxscore_list, win_or_lose):
-        if win_or_lose != "L":
-            return
+        #if win_or_lose != "L":
+        #    return
         
         for bs in boxscore_list:
             print("")
@@ -66,26 +66,26 @@ class FreethrowService(object):
             home_team_pts = str(bs["homeTeam"]["PTS"])
             homeTeam_ft = bs["homeTeam"]["FT"]
             homeTeam_fta = bs["homeTeam"]["FTA"]
+            homeTeam_assists = bs["homeTeam"]["AST"]
+            homeTeam_turnovers = bs["homeTeam"]["TO"]
 
             away_team = bs["awayTeam"]["team"]
             away_team_pts = str(bs["awayTeam"]["PTS"])
             awayTeam_ft = bs["awayTeam"]["FT"]
             awayTeam_fta = bs["awayTeam"]["FTA"]
+            awayTeam_assists = bs["awayTeam"]["AST"]
+            awayTeam_turnovers = bs["awayTeam"]["TO"]
 
             pt_diff = str(abs(bs["awayTeam"]["PTS"] - bs["homeTeam"]["PTS"]))
 
             print(game_date + " "  + away_team + " at "  + home_team + ": Final Score: " + home_team_pts + "-" + away_team_pts)
 
-            # self.logger.info(str(bs["game_date"]) + " " + str(bs["homeTeam"]["team"]) + " vs. " + str(bs["awayTeam"]["team"]) + " " + str(bs["homeTeam"]["PTS"]) +  "-" + str(bs["awayTeam"]["PTS"]))
-            # homeTeam = bs["homeTeam"]["team"]
-            # homeTeam_ft = bs["homeTeam"]["FT"]
-            # homeTeam_fta = bs["homeTeam"]["FTA"]
-            print(game_date + " " + home_team + " FT-FTA: " + str(homeTeam_ft) + "-" + str(homeTeam_fta))
 
-            # awayTeam = bs["awayTeam"]["team"]
-            # awayTeam_ft = bs["awayTeam"]["FT"]
-            # awayTeam_fta = bs["awayTeam"]["FTA"]
+            print(game_date + " " + home_team + " FT-FTA: " + str(homeTeam_ft) + "-" + str(homeTeam_fta))
             print(game_date + " " + away_team + " FT-FTA: " + str(awayTeam_ft) + "-" + str(awayTeam_fta))
+
+            #print(game_date + " " + home_team + " Assist/Turnover ratio: " + str(homeTeam_assists) + "/" + str(homeTeam_turnovers))
+            #print(game_date + " " + away_team + " Assist/Turnover ratio: " + str(awayTeam_assists) + "/" + str(awayTeam_turnovers))
 
 
 

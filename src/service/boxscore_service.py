@@ -28,6 +28,9 @@ class BoxscoreService(object):
         
         games_list = FileService.read_file(self.metadata_file_path)
         for game in games_list:
+            del game["playbyplay_url"] # don't want in boxscore file
+            del game["playbyplay_file"] # don't want in boxscore file
+            
             boxscore_file = game["boxscore_file"]
            
             teams_dict, team_totals = self.process_boxscore_file(boxscore_file)
